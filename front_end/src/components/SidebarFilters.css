@@ -142,6 +142,40 @@
   font-weight: 500;
 }
 
+.rating-range {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.rating-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rating-input label {
+  color: #b0b0b0;
+  font-size: 12px;
+}
+
+.rating-input input {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #2d2d3a;
+  border-radius: 6px;
+  background: #0f0f23;
+  color: white;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.rating-input input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
 .filter-actions {
   margin-top: 20px;
   padding-top: 20px;

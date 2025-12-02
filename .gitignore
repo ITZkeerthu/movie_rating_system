@@ -1,6 +1,6 @@
 # Dependencies
-/node_modules
-/front_end/node_modules
+node_modules/
+**/node_modules/
 /.pnp
 .pnp.js
 
@@ -21,6 +21,26 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Environment variables and sensitive data
+.env
+*.env
+.env.*
+!.env.example
+config.ini
+secrets.json
+credentials.json
+
+# API keys and tokens
+*_key.txt
+*_token.txt
+*.pem
+*.key
+*.cert
+
+# Database credentials
+database.yml
+database.ini
 
 # Python
 __pycache__/
@@ -48,5 +68,25 @@ var/
 *.db
 instance/*.db
 
+# PostgreSQL
+*.sql.backup
+*.dump
+pg_data/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
+*.log
+logs/
+*.log.*
+
 # VS Code
 .vscode/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~

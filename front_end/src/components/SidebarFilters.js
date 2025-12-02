@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import './SidebarFilters.css';
 
-const SidebarFilters = ({ onFiltersChange, isCollapsed, onToggleCollapse }) => {
-  const [filters, setFilters] = useState({
-    genres: [],
-    languages: [],
-    sortBy: 'rating'
+const SidebarFilters = ({ filters, filterOptions, onFiltersChange, isCollapsed, onToggleCollapse }) => {
+  const [localFilters, setLocalFilters] = useState({
+    genre: filters.genre || '',
+    year: filters.year || '',
+    min_rating: filters.min_rating || '',
+    max_rating: filters.max_rating || '',
+    sort: filters.sort || 'rating_desc'
   });
 
-  const [availableGenres, setAvailableGenres] = useState([
+  // Update local filters when props change
+  useEffect(() => {
+    setLocalFilters({
+      genre: filters.genre || '',
+      year: filters.year || '',
+      min_rating: filters.min_rating || '',
+      max_rating: filters.max_rating || '',
+      sort: filters.sort || 'rating_desc'
+    });
+  }, [filters]);
+
+  const [availableGenres] = useState(filterOptions.genres || [
     'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime',
     'Documentary', 'Drama', 'Family', 'Fantasy', 'Film-Noir', 'History',
     'Horror', 'Music', 'Musical', 'Mystery', 'Romance', 'Sci-Fi',
@@ -30,42 +43,53 @@ const SidebarFilters = ({ onFiltersChange, isCollapsed, onToggleCollapse }) => {
   ];
 
   const handleGenreChange = (genre) => {
-    setFilters(prev => ({
-      ...prev,
-      genres: prev.genres.includes(genre)
-        ? prev.genres.filter(g => g !== genre)
-        : [...prev.genres, genre]
-    }));
+    const newFilters = {
+      ...localFilters,
+      genre: genre === localFilters.genre ? '' : genre
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
   };
 
-  const handleLanguageChange = (language) => {
-    setFilters(prev => ({
-      ...prev,
-      languages: prev.languages.includes(language)
-        ? prev.languages.filter(l => l !== language)
-        : [...prev.languages, language]
-    }));
+  const handleYearChange = (year) => {
+    const newFilters = {
+      ...localFilters,
+      year: year === localFilters.year ? '' : year
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
   };
 
-  const handleSortChange = (sortBy) => {
-    setFilters(prev => ({
-      ...prev,
-      sortBy
-    }));
+  const handleRatingChange = (min, max) => {
+    const newFilters = {
+      ...localFilters,
+      min_rating: min,
+      max_rating: max
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  const handleSortChange = (sort) => {
+    const newFilters = {
+      ...localFilters,
+      sort
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
   };
 
   const clearFilters = () => {
-    setFilters({
-      genres: [],
-      languages: [],
-      sortBy: 'rating'
-    });
+    const defaultFilters = {
+      genre: '',
+      year: '',
+      min_rating: '',
+      max_rating: '',
+      sort: 'rating_desc'
+    };
+    setLocalFilters(defaultFilters);
+    onFiltersChange(defaultFilters);
   };
-
-  // Notify parent component when filters change
-  useEffect(() => {
-    onFiltersChange(filters);
-  }, [filters, onFiltersChange]);
 
   return (
     <div className={`filter-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -85,7 +109,7 @@ const SidebarFilters = ({ onFiltersChange, isCollapsed, onToggleCollapse }) => {
           <div className="filter-section">
             <h4>Sort By</h4>
             <select
-              value={filters.sortBy}
+              value={localFilters.sort}
               onChange={(e) => handleSortChange(e.target.value)}
               className="sort-dropdown"
             >
@@ -104,9 +128,10 @@ const SidebarFilters = ({ onFiltersChange, isCollapsed, onToggleCollapse }) => {
               {availableGenres.map(genre => (
                 <div key={genre} className="filter-option">
                   <input
-                    type="checkbox"
+                    type="radio"
                     id={`genre-${genre}`}
-                    checked={filters.genres.includes(genre)}
+                    name="genre"
+                    checked={localFilters.genre === genre}
                     onChange={() => handleGenreChange(genre)}
                   />
                   <label htmlFor={`genre-${genre}`}>
@@ -117,23 +142,69 @@ const SidebarFilters = ({ onFiltersChange, isCollapsed, onToggleCollapse }) => {
             </div>
           </div>
 
-          {/* Language Filters */}
+          {/* Year Filter */}
           <div className="filter-section">
-            <h4>Languages</h4>
+            <h4>Release Year</h4>
             <div className="filter-options">
-              {availableLanguages.map(language => (
-                <div key={language} className="filter-option">
+              {filterOptions.years?.map(year => (
+                <div key={year} className="filter-option">
                   <input
-                    type="checkbox"
-                    id={`lang-${language}`}
-                    checked={filters.languages.includes(language)}
-                    onChange={() => handleLanguageChange(language)}
+                    type="radio"
+                    id={`year-${year}`}
+                    name="year"
+                    checked={localFilters.year === year.toString()}
+                    onChange={() => handleYearChange(year.toString())}
                   />
-                  <label htmlFor={`lang-${language}`}>
-                    {language}
+                  <label htmlFor={`year-${year}`}>
+                    {year}
                   </label>
                 </div>
-              ))}
+              )) || Array.from({ length: 10 }, (_, i) => {
+                const year = new Date().getFullYear() - i;
+                return (
+                  <div key={year} className="filter-option">
+                    <input
+                      type="radio"
+                      id={`year-${year}`}
+                      name="year"
+                      checked={localFilters.year === year.toString()}
+                      onChange={() => handleYearChange(year.toString())}
+                    />
+                    <label htmlFor={`year-${year}`}>
+                      {year}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Rating Range */}
+          <div className="filter-section">
+            <h4>IMDb Rating</h4>
+            <div className="rating-range">
+              <div className="rating-input">
+                <label>Min:</label>
+                <input
+                  type="number"
+                  min={filterOptions.rating_range?.min || 0}
+                  max={filterOptions.rating_range?.max || 10}
+                  step="0.1"
+                  value={localFilters.min_rating}
+                  onChange={(e) => handleRatingChange(e.target.value, localFilters.max_rating)}
+                />
+              </div>
+              <div className="rating-input">
+                <label>Max:</label>
+                <input
+                  type="number"
+                  min={filterOptions.rating_range?.min || 0}
+                  max={filterOptions.rating_range?.max || 10}
+                  step="0.1"
+                  value={localFilters.max_rating}
+                  onChange={(e) => handleRatingChange(localFilters.min_rating, e.target.value)}
+                />
+              </div>
             </div>
           </div>
 

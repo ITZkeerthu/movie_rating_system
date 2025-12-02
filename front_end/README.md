@@ -31,6 +31,20 @@ A modern, responsive React frontend for a movie rating and discovery system. Thi
 - **Quick Actions**: Easy navigation to key features
 - **Account Settings**: Notification and privacy preferences
 
+## 📸 Screenshots
+
+### Movie Filtering
+![Movie Filtering](../movie_filtering.png)
+*Advanced filtering options with real-time search and category selection*
+
+### User Profile
+![Profile Information](../prodile_info.png)
+*User profile page with account details and quick actions*
+
+### Watchlist
+![Watchlist](../watchlist.png)
+*Personal watchlist management with saved movies*
+
 ## 🚀 Getting Started
 
 ### Prerequisites

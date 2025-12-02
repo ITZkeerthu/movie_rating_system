@@ -9,6 +9,7 @@ const MovieCard = ({ movie, initialInWatchlist = false, onWatchlistChange }) => 
   const { user } = useAuth();
   const [inWatchlist, setInWatchlist] = useState(initialInWatchlist);
   const [isLoading, setIsLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleMovieClick = () => {
     navigate(`/movie/${movie.id}`);

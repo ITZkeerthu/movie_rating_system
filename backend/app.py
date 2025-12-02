@@ -12,10 +12,8 @@ app = Flask(__name__)
 
 # Basic config
 app.config["SECRET_KEY"] = "dev-secret-key"
-# Use absolute path for database
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'movies.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+# PostgreSQL database configuration
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:129141@localhost:5432/movie_rating_system"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # JWT
