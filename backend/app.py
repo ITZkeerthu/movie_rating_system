@@ -8,16 +8,18 @@ from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import bcrypt
 from dotenv import load_dotenv
 
+from db_config import database_url  # also loads .env
+
 app = Flask(__name__)
 
 # Basic config
-app.config["SECRET_KEY"] = "dev-secret-key"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
 # PostgreSQL database configuration
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:129141@localhost:5432/movie_rating_system"
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # JWT
-app.config["JWT_SECRET_KEY"] = "dev-jwt-secret"
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "dev-jwt-secret")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=3600)
 
 # Import models first

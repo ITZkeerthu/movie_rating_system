@@ -247,3 +247,9 @@ API routes
 - Watchlist: GET /watchlist, POST /watchlist/add, POST /watchlist/remove
 
 
+
+## Configuration
+
+Database credentials and secrets are read from environment variables (or `backend/.env`, which is git-ignored).
+Copy `.env.example` to `backend/.env` and set `POSTGRES_PASSWORD`, `SECRET_KEY` and `JWT_SECRET_KEY`
+(or provide a full `DATABASE_URL`). Utility scripts in `backend/` share `backend/db_config.py`.

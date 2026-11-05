@@ -1,4 +1,5 @@
 import psycopg2
+from db_config import pg_connect_kwargs
 from psycopg2.extras import RealDictCursor
 
 def print_table_data(cursor, table_name):
@@ -24,14 +25,7 @@ def print_table_data(cursor, table_name):
             print(f"{key}: {value}")
 
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="movie_rating_system",
-    user="postgres",
-    password="129141",
-    host="localhost",
-    port="5432",
-    cursor_factory=RealDictCursor
-)
+conn = psycopg2.connect(**pg_connect_kwargs("movie_rating_system"), cursor_factory=RealDictCursor)
 cursor = conn.cursor()
 
 # Get all tables

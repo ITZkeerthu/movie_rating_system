@@ -1,5 +1,6 @@
 import sqlite3
 import psycopg2
+from db_config import pg_connect_kwargs
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import os
 from datetime import datetime
@@ -10,13 +11,7 @@ sqlite_conn = sqlite3.connect(sqlite_db_path)
 sqlite_cursor = sqlite_conn.cursor()
 
 # PostgreSQL connection
-pg_conn = psycopg2.connect(
-    dbname="postgres",
-    user="postgres",
-    password="129141",
-    host="localhost",
-    port="5432"
-)
+pg_conn = psycopg2.connect(**pg_connect_kwargs("postgres"))
 pg_conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 pg_cursor = pg_conn.cursor()
 
@@ -29,13 +24,7 @@ except Exception as e:
 
 # Close initial connection and connect to new database
 pg_conn.close()
-pg_conn = psycopg2.connect(
-    dbname="movie_rating_system",
-    user="postgres",
-    password="129141",
-    host="localhost",
-    port="5432"
-)
+pg_conn = psycopg2.connect(**pg_connect_kwargs("movie_rating_system"))
 pg_cursor = pg_conn.cursor()
 
 # Create tables in PostgreSQL

@@ -1,13 +1,8 @@
 import psycopg2
+from db_config import pg_connect_kwargs
 
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="movie_rating_system",
-    user="postgres",
-    password="129141",
-    host="localhost",
-    port="5432"
-)
+conn = psycopg2.connect(**pg_connect_kwargs("movie_rating_system"))
 
 def print_query_results(cursor, query, title):
     cursor.execute(query)
