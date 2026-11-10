@@ -113,7 +113,7 @@ def remove_movie_from_watchlist(movie_id):
 @jwt_required()
 def get_watchlist_status():
     """GET /watchlist/status?movie_ids=1,2,3 - Check watchlist status for multiple movies"""
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     movie_ids_param = request.args.get('movie_ids', '')
     
     if not movie_ids_param:

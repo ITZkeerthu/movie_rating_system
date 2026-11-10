@@ -10,6 +10,8 @@ from models import Movie, db
 
 movies_bp = Blueprint("movies", __name__)
 
+MAX_LIMIT = 200  # upper bound for the ?limit= query parameter
+
 
 @movies_bp.get("")
 def list_movies():
@@ -33,6 +35,9 @@ def list_movies():
     max_rating = request.args.get("max_rating", type=float)
     sort = request.args.get("sort", "rating_desc")
     limit = request.args.get("limit", 60, type=int)
+    if limit is None or limit < 1:
+        limit = 60
+    limit = min(limit, MAX_LIMIT)
     
     # Build query
     query = Movie.query

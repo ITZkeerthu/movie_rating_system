@@ -14,7 +14,9 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.post("/register")
 def register():
-    data = request.get_json(force=True)
+    data = request.get_json(force=True, silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"message": "Invalid JSON body"}), 400
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
@@ -39,7 +41,9 @@ def register():
 
 @auth_bp.post("/login")
 def login():
-    data = request.get_json(force=True)
+    data = request.get_json(force=True, silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"message": "Invalid JSON body"}), 400
     email = data.get("email")
     password = data.get("password")
 
