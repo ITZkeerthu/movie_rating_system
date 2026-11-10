@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install Flask==3.0.3 Flask-Cors==4.0.1 Flask-JWT-Extended==4.6.0 \
+            Flask-SQLAlchemy==3.1.1 SQLAlchemy==2.0.35 python-dotenv==1.0.1 \
+            "passlib[bcrypt]==1.7.4" "bcrypt<4.1" pytest
+      - name: Run route tests (in-memory SQLite)
+        working-directory: backend
+        run: python -m pytest tests -q
