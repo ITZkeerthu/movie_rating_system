@@ -24,6 +24,9 @@ def register():
     if not username or not email or not password:
         return jsonify({"message": "Missing fields"}), 400
 
+    if not all(isinstance(v, str) for v in (username, email, password)):
+        return jsonify({"message": "username, email and password must be strings"}), 400
+
     if User.query.filter((User.username == username) | (User.email == email)).first():
         return jsonify({"message": "User already exists"}), 409
 
@@ -49,6 +52,9 @@ def login():
 
     if not email or not password:
         return jsonify({"message": "Missing credentials"}), 400
+
+    if not isinstance(email, str) or not isinstance(password, str):
+        return jsonify({"message": "email and password must be strings"}), 400
 
     user = User.query.filter_by(email=email).first()
     if not user or not user.check_password(password):

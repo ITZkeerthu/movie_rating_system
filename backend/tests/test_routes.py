@@ -80,3 +80,11 @@ def test_movies_search_treats_wildcards_literally(client):
     assert client.get("/movies?search=_lpha").get_json()["total_count"] == 0
     assert client.get("/movies?search=alp").get_json()["total_count"] == 1
     assert client.get("/movies?genre=%25").get_json()["total_count"] == 0
+
+
+def test_auth_rejects_non_string_fields(client):
+    r = client.post("/auth/register", json={
+        "username": "u2", "email": "u2@example.com", "password": 12345})
+    assert r.status_code == 400
+    r = client.post("/auth/login", json={"email": ["a"], "password": {"x": 1}})
+    assert r.status_code == 400
