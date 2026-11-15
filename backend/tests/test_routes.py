@@ -73,3 +73,10 @@ def test_watchlist_status_uses_integer_user_id(client):
     assert r.status_code == 200
     assert r.get_json()["status"] == {"1": True, "2": False}
     assert client.get("/watchlist/status?movie_ids=a", headers=h).status_code == 400
+
+
+def test_movies_search_treats_wildcards_literally(client):
+    assert client.get("/movies?search=%25").get_json()["total_count"] == 0
+    assert client.get("/movies?search=_lpha").get_json()["total_count"] == 0
+    assert client.get("/movies?search=alp").get_json()["total_count"] == 1
+    assert client.get("/movies?genre=%25").get_json()["total_count"] == 0

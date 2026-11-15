@@ -13,6 +13,12 @@ movies_bp = Blueprint("movies", __name__)
 MAX_LIMIT = 200  # upper bound for the ?limit= query parameter
 
 
+def _like_pattern(term: str) -> str:
+    """Build a contains-pattern for ILIKE, escaping LIKE wildcards in user input."""
+    escaped = term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
 @movies_bp.get("")
 def list_movies():
     """GET /movies - Browse movies with search and filter options
@@ -45,7 +51,7 @@ def list_movies():
     # Apply filters
     if search:
         # Search in movie title (Film)
-        query = query.filter(Movie.title.ilike(f"%{search}%"))
+        query = query.filter(Movie.title.ilike(_like_pattern(search), escape="\\"))
     
     if year:
         # Filter by release year (Year)
@@ -53,7 +59,7 @@ def list_movies():
     
     if genre:
         # Filter by genre (Genre)
-        query = query.filter(Movie.genre.ilike(f"%{genre}%"))
+        query = query.filter(Movie.genre.ilike(_like_pattern(genre), escape="\\"))
     
     if min_rating is not None:
         # Filter by minimum IMDb rating
