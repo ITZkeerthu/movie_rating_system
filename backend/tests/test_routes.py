@@ -88,3 +88,60 @@ def test_auth_rejects_non_string_fields(client):
     assert r.status_code == 400
     r = client.post("/auth/login", json={"email": ["a"], "password": {"x": 1}})
     assert r.status_code == 400
+
+
+def test_watchlist_add_list_remove_roundtrip(client):
+    h = register(client)
+    assert client.post("/watchlist/1", headers=h).status_code == 201
+    # Adding twice is a no-op that reports the movie is already present
+    dup = client.post("/watchlist/1", headers=h)
+    assert dup.status_code == 200
+    assert dup.get_json()["success"] is False
+
+    listing = client.get("/watchlist", headers=h).get_json()
+    assert listing["total_count"] == 1
+    assert listing["watchlist"][0]["title"] == "Alpha"
+    assert listing["watchlist"][0]["in_watchlist"] is True
+
+    assert client.delete("/watchlist/1", headers=h).status_code == 200
+    assert client.get("/watchlist", headers=h).get_json()["total_count"] == 0
+    # Removing something that is no longer there is a 404
+    assert client.delete("/watchlist/1", headers=h).status_code == 404
+
+
+def test_watchlist_unknown_movie_returns_404(client):
+    h = register(client)
+    assert client.post("/watchlist/999", headers=h).status_code == 404
+    assert client.delete("/watchlist/999", headers=h).status_code == 404
+
+
+def test_watchlist_requires_auth_and_is_per_user(client):
+    assert client.get("/watchlist").status_code == 401
+    h1 = register(client, "u1")
+    h2 = register(client, "u2")
+    client.post("/watchlist/1", headers=h1)
+    assert client.get("/watchlist", headers=h1).get_json()["total_count"] == 1
+    assert client.get("/watchlist", headers=h2).get_json()["total_count"] == 0
+
+
+def test_me_returns_current_user_and_requires_token(client):
+    assert client.get("/auth/me").status_code == 401
+    h = register(client)
+    body = client.get("/auth/me", headers=h).get_json()
+    assert body["username"] == "u1"
+    assert body["email"] == "u1@example.com"
+    assert "password" not in body and "password_hash" not in body
+
+
+def test_movies_rating_year_and_sort_filters(client):
+    def titles(qs):
+        return [m["title"] for m in client.get("/movies" + qs).get_json()["movies"]]
+
+    assert titles("?min_rating=7") == ["Alpha"]
+    assert titles("?max_rating=7") == ["Beta"]
+    assert titles("?year=2010") == ["Beta"]
+    assert titles("?sort=year_asc") == ["Alpha", "Beta"]
+    assert titles("?sort=year_desc") == ["Beta", "Alpha"]
+    assert titles("?sort=title_asc") == ["Alpha", "Beta"]
+    # Unknown sort values fall back to rating_desc instead of erroring
+    assert titles("?sort=bogus") == ["Alpha", "Beta"]
