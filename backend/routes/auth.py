@@ -71,7 +71,7 @@ def login():
 @jwt_required()
 def me():
     user_id = get_jwt_identity()
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, int(user_id))
     return jsonify({"id": user.id, "username": user.username, "email": user.email})
 
 

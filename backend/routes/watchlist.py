@@ -45,7 +45,7 @@ def add_movie_to_watchlist(movie_id):
     user_id = int(get_jwt_identity())
     
     # Check if movie exists
-    movie = Movie.query.get(movie_id)
+    movie = db.session.get(Movie, movie_id)
     if not movie:
         return jsonify({
             "success": False,
@@ -81,7 +81,7 @@ def remove_movie_from_watchlist(movie_id):
     user_id = int(get_jwt_identity())
     
     # Check if movie exists
-    movie = Movie.query.get(movie_id)
+    movie = db.session.get(Movie, movie_id)
     if not movie:
         return jsonify({
             "success": False,
