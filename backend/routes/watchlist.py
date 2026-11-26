@@ -11,6 +11,8 @@ from models import Watchlist, Movie
 
 watchlist_bp = Blueprint("watchlist", __name__)
 
+MAX_STATUS_IDS = 200  # upper bound for ?movie_ids= to keep the IN (...) query small
+
 
 @watchlist_bp.get("")
 @jwt_required()
@@ -123,6 +125,9 @@ def get_watchlist_status():
         movie_ids = [int(id.strip()) for id in movie_ids_param.split(',') if id.strip()]
     except ValueError:
         return jsonify({"error": "Invalid movie_ids format"}), 400
+
+    if len(movie_ids) > MAX_STATUS_IDS:
+        return jsonify({"error": f"Too many movie_ids (max {MAX_STATUS_IDS})"}), 400
     
     # Get watchlist status for requested movies
     watchlist_items = Watchlist.query.filter(

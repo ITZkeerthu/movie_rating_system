@@ -145,3 +145,17 @@ def test_movies_rating_year_and_sort_filters(client):
     assert titles("?sort=title_asc") == ["Alpha", "Beta"]
     # Unknown sort values fall back to rating_desc instead of erroring
     assert titles("?sort=bogus") == ["Alpha", "Beta"]
+
+
+def test_watchlist_status_rejects_too_many_ids(client):
+    h = register(client)
+    ids = ",".join(str(i) for i in range(1, 202))
+    assert client.get(f"/watchlist/status?movie_ids={ids}", headers=h).status_code == 400
+    ids = ",".join(str(i) for i in range(1, 201))
+    assert client.get(f"/watchlist/status?movie_ids={ids}", headers=h).status_code == 200
+
+
+def test_cors_origins_env_is_honoured(client):
+    r = client.options("/movies", headers={
+        "Origin": "http://localhost:3000", "Access-Control-Request-Method": "GET"})
+    assert r.headers.get("Access-Control-Allow-Origin") == "http://localhost:3000"
