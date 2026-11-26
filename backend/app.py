@@ -30,7 +30,13 @@ db.init_app(app)
 jwt = JWTManager(app)
 
 # CORS
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+# Comma-separated list of allowed origins; defaults to the local React dev server.
+CORS_ORIGINS = [
+    o.strip()
+    for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    if o.strip()
+]
+CORS(app, resources={r"/*": {"origins": CORS_ORIGINS}}, supports_credentials=True)
 
 # Initialize database
 with app.app_context():
